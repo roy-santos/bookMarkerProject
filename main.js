@@ -5,7 +5,11 @@ function saveBookmark(e) {
     //Get form values
     var siteName = document.getElementById('siteName').value;
     var siteUrl = document.getElementById('siteUrl').value;
-    
+
+    if(!validateForm(siteName,siteUrl)) {
+        return false;
+    }
+
     var bookmark = {
         name: siteName,
         url: siteUrl
@@ -33,10 +37,35 @@ function saveBookmark(e) {
         bookmarks.push(bookmark);
         //Re-set back to LocalStorage
         localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
-    }  
+    } 
+    
+    //Clear form
+    document.getElementById('myForm').reset();
  
+    //Re-fetch bookmarks
+    fetchBookmarks();
+
     //Prevent form from submitting
     e.preventDefault();
+}
+
+//Delete bookmark
+function deleteBookmark(url) {
+    //Get bookmarks from LocalStorage
+    var bookmarks = JSON.parse(localStorage.getItem('bookmarks'));
+    //Loop thorugh bookmarks
+    for(var i=0; i<bookmarks.length; i++){
+        if(bookmarks[i].url == url) {
+            //Remove from array
+            bookmarks.splice(i,1);
+        }
+    }
+    //Re-set back to localStorage
+    localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+
+    //Re-fetch bookmarks
+    fetchBookmarks();
+
 }
 
 //Fetch bookmarks
@@ -57,8 +86,26 @@ function fetchBookmarks() {
         bookmarksResults.innerHTML += '<div class="card card-body bg-light">'+
                                       '<h3>'+name+
                                       ' <a class="btn btn-outline-secondary" target="_blank" href="'+url+'">Visit</a> '+
-                                      ' <a onclick="deleteBookmark(\''+url+'\')" class="btn btn-danger" target="_blank" href="#">Delete</a> '+
+                                      ' <a onclick="deleteBookmark(\''+url+'\')" class="btn btn-danger" href="#">Delete</a> '+
                                       '</h3>'
                                       '</div>';
     }
+}
+
+//Validate form
+function validateForm(siteName, siteUrl){
+        
+    if(!siteName || !siteUrl) {
+        alert('Please fill in the form');
+        return false;
+    }
+
+    var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
+    var regex = new RegExp(expression);
+
+    if(!siteUrl.match(regex)) {
+        alert('Please use a valid URL');
+        return false;
+    }
+    return true;
 }
