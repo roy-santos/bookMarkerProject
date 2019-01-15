@@ -104,7 +104,7 @@ function validateForm(siteName, siteUrl){
     var regex = new RegExp(expression);
 
     if(!siteUrl.match(regex)) {
-        alert('Please use a valid URL');
+        alert('Please use a valid URL (http://...)');
         return false;
     }
     return true;
